@@ -4,6 +4,7 @@ import psycopg2
 import ipdb
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 # Configure the database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/huat_api_flask'
@@ -26,12 +27,13 @@ class Fourds(db.Model):
 
 # ipdb.set_trace()
 
-@app.route("/")
-def hello_world():
+@app.get("/api/v1/4d/result")
+def latest_result():
     with app.app_context():
         last = Fourds.query.first()
         # ipdb.set_trace()
+        # refactor below
         result = {'draw_date': last.drawdate, 'draw_number': last.drawnumber, 'first': last.first,
-                  'second': last.second, 'third': last.third, 'starter': last.starter, 'consolation': last.consolation}
+                  'second': last.second, 'third': last.third, 'starter': last.starter.replace('{', '').replace('}', ''), 'consolation': last.consolation.replace('{', '').replace('}', '')}
 
         return jsonify(result)
