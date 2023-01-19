@@ -37,3 +37,15 @@ def latest_result():
                   'second': last.second, 'third': last.third, 'starter': last.starter.replace('{', '').replace('}', ''), 'consolation': last.consolation.replace('{', '').replace('}', '')}
 
         return jsonify(result)
+
+@app.get("/api/v1/4d/dates")
+def get_dates():
+    with app.app_context():
+        dates = Fourds.query.with_entities(Fourds.drawdate).all()
+        # ipdb.set_trace()
+        # convert query rows to list
+        date_list = [list(date) for date in dates]
+        # flatten the list
+        date_list = [item for items in date_list for item in items]
+        result = {'dates': date_list}
+        return jsonify(result)
