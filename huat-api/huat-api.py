@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 import ipdb
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -31,8 +32,19 @@ class Fourds(db.Model):
 def latest_result():
     with app.app_context():
         if request.method == 'POST':
+            data = request.get_json()
+            print(data)
+            # date_string = "4/1/2023"
+            date_format = "%d/%m/%Y"
+            date_object = datetime.strptime(data['date'], date_format).date()
+            date_result = Fourds.query.filter(Fourds.drawdate == date_object).first()
+            # ipdb.set_trace()
+            result = {'draw_date': date_result.drawdate, 'draw_number': date_result.drawnumber, 'first': date_result.first,
+                      'second': date_result.second, 'third': date_result.third, 'starter': date_result.starter.replace('{', '').replace('}', ''), 'consolation': date_result.consolation.replace('{', '').replace('}', '')}
+            return jsonify(result)
+            # print(date_object)
             # post request here
-            return 'post request'
+            # return 'post request'
         else:
             last = Fourds.query.first()
         # ipdb.set_trace()
