@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 import ipdb
@@ -27,16 +27,19 @@ class Fourds(db.Model):
 
 # ipdb.set_trace()
 
-@app.get("/api/v1/4d/result")
+@app.route("/api/v1/4d/result", methods=['GET','POST'])
 def latest_result():
     with app.app_context():
-        last = Fourds.query.first()
+        if request.method == 'POST':
+            # post request here
+            return 'post request'
+        else:
+            last = Fourds.query.first()
         # ipdb.set_trace()
         # refactor below
-        result = {'draw_date': last.drawdate, 'draw_number': last.drawnumber, 'first': last.first,
+            result = {'draw_date': last.drawdate, 'draw_number': last.drawnumber, 'first': last.first,
                   'second': last.second, 'third': last.third, 'starter': last.starter.replace('{', '').replace('}', ''), 'consolation': last.consolation.replace('{', '').replace('}', '')}
-
-        return jsonify(result)
+            return jsonify(result)
 
 @app.get("/api/v1/4d/dates")
 def get_dates():
