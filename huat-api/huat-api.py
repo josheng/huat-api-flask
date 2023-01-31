@@ -33,24 +33,31 @@ def latest_result():
     with app.app_context():
         if request.method == 'POST':
             data = request.get_json()
+            # drawdate is required
             try:
                 data['drawdate']
             except KeyError:
                 return jsonify({"error": "please provide a valid parameter"})
             date_format = "%d/%m/%Y"
-            # need error catching for invalid params
             date_object = datetime.strptime(data['drawdate'], date_format).date()
             date_result = Fourds.query.filter(Fourds.drawdate == date_object).first()
-            # ipdb.set_trace()
             result = {'draw_date': date_result.drawdate, 'draw_number': date_result.drawnumber, 'first': date_result.first,
                       'second': date_result.second, 'third': date_result.third, 'starter': date_result.starter.replace('{', '').replace('}', ''), 'consolation': date_result.consolation.replace('{', '').replace('}', '')}
+            # check results here
+            check_result(data['number'], data['bet'], result)
             return jsonify(result)
         else:
+            # GET
             last = Fourds.query.first()
-        # refactor below
+            # refactor below
             result = {'draw_date': last.drawdate, 'draw_number': last.drawnumber, 'first': last.first,
                   'second': last.second, 'third': last.third, 'starter': last.starter.replace('{', '').replace('}', ''), 'consolation': last.consolation.replace('{', '').replace('}', '')}
             return jsonify(result)
+
+def check_result(number, bet, result):
+    print(number)
+    print(bet)
+    print(result)
 
 @app.get("/api/v1/4d/dates")
 def get_dates():
